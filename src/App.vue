@@ -2,17 +2,20 @@
   <div id="app" class="container">
     <header :class="`connected-${connected}`">Recent translations</header>
     <main class="row justify-center align-start">
-      <ul class="translations col col-lg-12 col-xs-12 ma-0 pa-0">
+      <ul class="translations col-12 ma-0 pa-0">
         <li
           class="row justify-start pa-4"
           :key="index"
           v-for="(message, index) in messages"
         >
-          <span class="domain col-3">{{ message.meta.domain }}</span>
-          <a class="title col-3" :href="message.meta.uri" target="_blank">{{
-            message.page_title
-          }}</a>
-          <span class="user col-5"
+          <h2 class="title ma-0 col-12">
+            {{ message.page_title.replace(/_/g, " ")
+            }}<a :href="message.meta.uri" target="_blank"
+              ><i class="material-icons">launch</i></a
+            >
+          </h2>
+          <span class="domain col-12">{{ message.meta.domain }} </span>
+          <span class="user col-12"
             ><User :user="message.performer.user_text" />
           </span>
         </li>
@@ -101,13 +104,14 @@ header {
 }
 .title {
   text-decoration: none;
-  color: royalblue;
+  color: #01579b;
 }
 .date {
   padding: 4px;
 }
 .domain {
-  padding: 4px;
+  padding: 0 4px;
+  color: #999;
 }
 .title {
   padding: 4px;

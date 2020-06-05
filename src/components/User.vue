@@ -1,6 +1,6 @@
 <template>
   <details class="container">
-    <summary>
+    <summary @click="fetchStats(user)">
       <span>{{ this.user }}</span>
       <span class="total" v-if="total">({{ total }})</span>
     </summary>
@@ -9,7 +9,12 @@
         >User:{{ this.user }}</a
       >
     </div>
-    <chart v-if="loaded" :chartdata="chartdata" :options="chartOptions" />
+    <chart
+      v-if="loaded"
+      :chartdata="chartdata"
+      :options="chartOptions"
+      :styles="chartStyles"
+    /><span v-else>Loading stats...</span>
   </details>
 </template>
 
@@ -25,7 +30,11 @@ export default {
   data: () => ({
     loaded: false,
     cxtranslatorstats: {},
-    chartOptions: {}
+    chartOptions: { responsive: true, maintainAspectRatio: false },
+    chartStyles: {
+      position: "relative",
+      height: "300px"
+    }
   }),
   computed: {
     publishTrend() {
@@ -41,6 +50,7 @@ export default {
     chartdata() {
       return {
         labels: this.months,
+        responsive: true,
         datasets: [
           {
             label: "Published translations",
@@ -53,19 +63,22 @@ export default {
       };
     }
   },
-  async created() {
-    this.loaded = false;
-    try {
-      const { cxtranslatorstats } = await fetch(
-        `https://en.wikipedia.org/w/api.php?action=query&list=cxtranslatorstats&translator=${encodeURIComponent(
-          this.user
-        )}&origin=*&format=json`
-      ).then(response => response.json());
-      this.cxtranslatorstats = cxtranslatorstats;
-      this.loaded = true;
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
+
+  methods: {
+    async fetchStats(user) {
+      if (this.loaded) return;
+      try {
+        const { cxtranslatorstats } = await fetch(
+          `https://en.wikipedia.org/w/api.php?action=query&list=cxtranslatorstats&translator=${encodeURIComponent(
+            user
+          )}&origin=*&format=json`
+        ).then(response => response.json());
+        this.cxtranslatorstats = cxtranslatorstats;
+        this.loaded = true;
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+      }
     }
   }
 };
