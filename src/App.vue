@@ -2,17 +2,19 @@
   <div id="app" class="container">
     <header :class="`connected-${connected}`">Recent translations</header>
     <main class="row justify-center align-start">
-      <ul class="translations col col-lg-10 col-md-12 ma-0 pa-0">
+      <ul class="translations col col-lg-12 ma-0 pa-0">
         <li
           class="row justify-start pa-4"
           :key="index"
           v-for="(message, index) in messages"
         >
           <span class="domain col-3">{{ message.meta.domain }}</span>
-          <a class="title col-5" :href="message.meta.uri">{{
+          <a class="title col-3" :href="message.meta.uri">{{
             message.page_title
           }}</a>
-          <span class="user col-3">{{ message.performer.user_text }}</span>
+          <span class="user col-5"
+            ><User :user="message.performer.user_text" />
+          </span>
         </li>
       </ul>
     </main>
@@ -21,6 +23,7 @@
 </template>
 
 <script>
+import User from "./components/User";
 export default {
   data: () => ({
     eventStreamSource: "https://stream.wikimedia.org/v2/stream/page-create",
@@ -28,6 +31,7 @@ export default {
     eventSource: null,
     messages: []
   }),
+  components: { User },
   methods: {
     init() {
       this.eventSource = new EventSource(this.eventStreamSource);
