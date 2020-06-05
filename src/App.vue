@@ -2,14 +2,14 @@
   <div id="app" class="container">
     <header :class="`connected-${connected}`">Recent translations</header>
     <main class="row justify-center align-start">
-      <ul class="translations col col-lg-12 ma-0 pa-0">
+      <ul class="translations col col-lg-12 col-xs-12 ma-0 pa-0">
         <li
           class="row justify-start pa-4"
           :key="index"
           v-for="(message, index) in messages"
         >
           <span class="domain col-3">{{ message.meta.domain }}</span>
-          <a class="title col-3" :href="message.meta.uri">{{
+          <a class="title col-3" :href="message.meta.uri" target="_blank">{{
             message.page_title
           }}</a>
           <span class="user col-5"
@@ -116,7 +116,7 @@ header {
 
 ul li {
   &:hover {
-    background-color: #e3f2fd;
+    background-color: #fafafa;
     border-left: 1px solid #2196f3;
   }
 }

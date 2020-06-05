@@ -5,7 +5,7 @@
       <span class="total" v-if="total">({{ total }})</span>
     </summary>
     <div>
-      <a :href="`https://en.wikipedia.org/wiki/User:${user}`"
+      <a :href="`https://en.wikipedia.org/wiki/User:${user}`" target="_blank"
         >User:{{ this.user }}</a
       >
     </div>
@@ -44,20 +44,22 @@ export default {
         datasets: [
           {
             label: "Published translations",
-            borderColor: "#01579b",
+            borderColor: "#40c4ff",
             borderWidth: 2,
-            backgroundColor: "#81d4fa",
+            backgroundColor: "#b3e5fc",
             data: this.months.map(month => this.publishTrend[month].delta)
           }
         ]
       };
     }
   },
-  async mounted() {
+  async created() {
     this.loaded = false;
     try {
       const { cxtranslatorstats } = await fetch(
-        `https://en.wikipedia.org/w/api.php?action=query&list=cxtranslatorstats&translator=${this.user}&origin=*&format=json`
+        `https://en.wikipedia.org/w/api.php?action=query&list=cxtranslatorstats&translator=${encodeURIComponent(
+          this.user
+        )}&origin=*&format=json`
       ).then(response => response.json());
       this.cxtranslatorstats = cxtranslatorstats;
       this.loaded = true;
