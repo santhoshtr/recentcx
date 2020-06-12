@@ -1,12 +1,12 @@
 <template>
   <details class="container">
-    <summary @click="fetchStats(user)">
-      <span>{{ this.user }}</span>
+    <summary>
+      <span>{{ user }}</span>
       <span class="total" v-if="total">({{ total }})</span>
     </summary>
     <div>
       <a :href="`https://en.wikipedia.org/wiki/User:${user}`" target="_blank"
-        >User:{{ this.user }}</a
+        >User:{{ user }}</a
       >
     </div>
     <chart
@@ -22,7 +22,7 @@
 import Chart from "./Chart.vue";
 
 export default {
-  name: "LineChartContainer",
+  name: "UserTranslation",
   props: {
     user: String
   },
@@ -80,6 +80,9 @@ export default {
         console.error(e);
       }
     }
+  },
+  mounted: function() {
+    this.fetchStats(this.user);
   }
 };
 </script>

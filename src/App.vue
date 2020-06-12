@@ -5,16 +5,18 @@
       <ul class="translations col-12 ma-0 pa-0">
         <li
           class="row justify-start pa-4"
-          :key="index"
-          v-for="(message, index) in messages"
+          :key="message.meta.id"
+          v-for="message in messages"
         >
           <h2 class="title ma-0 col-12">
-            {{ message.page_title.replace(/_/g, " ")
-            }}<a :href="message.meta.uri" target="_blank"
-              ><i class="material-icons">launch</i></a
-            >
+            {{ message.page_title.replace(/_/g, " ") }}
           </h2>
-          <span class="domain col-12">{{ message.meta.domain }} </span>
+          <span class="domain col-12"
+            >{{ message.meta.domain }}
+            <a :href="message.meta.uri" target="_blank"
+              ><i class="material-icons">launch</i></a
+            ></span
+          >
           <span class="user col-12"
             ><User :user="message.performer.user_text" />
           </span>
@@ -121,7 +123,6 @@ header {
 ul li {
   &:hover {
     background-color: #fafafa;
-    border-left: 1px solid #2196f3;
   }
 }
 </style>
