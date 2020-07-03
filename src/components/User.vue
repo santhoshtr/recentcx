@@ -1,21 +1,28 @@
 <template>
-  <details class="container">
-    <summary>
-      <span>{{ user }}</span>
-      <span class="total" v-if="total">({{ total }})</span>
-    </summary>
-    <div>
-      <a :href="`https://en.wikipedia.org/wiki/User:${user}`" target="_blank"
+  <section class="container">
+    <div class="col-12">
+      <a
+        class="user"
+        :href="`https://en.wikipedia.org/wiki/User:${user}`"
+        target="_blank"
         >User:{{ user }}</a
+      >
+      <a
+        class="total"
+        v-if="total"
+        href="#"
+        @click="detailsOpen = !detailsOpen"
+        title="See contribution graph"
+        >{{ total }} translations</a
       >
     </div>
     <chart
-      v-if="loaded"
+      v-if="loaded && detailsOpen"
       :chartdata="chartdata"
       :options="chartOptions"
       :styles="chartStyles"
-    /><span v-else>Loading stats...</span>
-  </details>
+    />
+  </section>
 </template>
 
 <script>
@@ -29,6 +36,7 @@ export default {
   components: { Chart },
   data: () => ({
     loaded: false,
+    detailsOpen: false,
     cxtranslatorstats: {},
     chartOptions: { responsive: true, maintainAspectRatio: false },
     chartStyles: {
@@ -63,26 +71,20 @@ export default {
       };
     }
   },
-
-  methods: {
-    async fetchStats(user) {
-      if (this.loaded) return;
-      try {
-        const { cxtranslatorstats } = await fetch(
-          `https://en.wikipedia.org/w/api.php?action=query&list=cxtranslatorstats&translator=${encodeURIComponent(
-            user
-          )}&origin=*&format=json`
-        ).then(response => response.json());
-        this.cxtranslatorstats = cxtranslatorstats;
-        this.loaded = true;
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error(e);
-      }
+  async mounted() {
+    if (this.loaded) return;
+    try {
+      const { cxtranslatorstats } = await fetch(
+        `https://en.wikipedia.org/w/api.php?action=query&list=cxtranslatorstats&translator=${encodeURIComponent(
+          this.user
+        )}&origin=*&format=json`
+      ).then(response => response.json());
+      this.cxtranslatorstats = cxtranslatorstats;
+      this.loaded = true;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
     }
-  },
-  mounted: function() {
-    this.fetchStats(this.user);
   }
 };
 </script>
@@ -90,8 +92,10 @@ export default {
 .total {
   color: #009688;
   padding: 0 8px;
+  cursor: pointer;
 }
-summary:focus {
-  outline: none;
+.user {
+  padding-right: 8px;
+  border-right: 1px solid #666;
 }
 </style>

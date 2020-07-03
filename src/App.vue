@@ -2,7 +2,7 @@
   <div id="app" class="container">
     <header :class="`connected-${connected}`">Recent translations</header>
     <main class="row justify-center align-start">
-      <ul class="translations col-12 ma-0 pa-0">
+      <ul class="translations col-12 ma-0 pa-0" v-if="messages.length">
         <li
           class="row justify-start pa-4"
           :key="message.meta.id"
@@ -13,17 +13,19 @@
           </h2>
           <span class="domain col-12"
             >{{ message.meta.domain }}
-            <a :href="message.meta.uri" target="_blank"
-              ><i class="material-icons">launch</i></a
-            ></span
+            <a :href="message.meta.uri" target="_blank">View article</a></span
           >
-          <span class="user col-12"
+          <span class="userstats col-12"
             ><User :user="message.performer.user_text" />
           </span>
         </li>
       </ul>
+      <p v-else>Waiting for translations...</p>
     </main>
-    <footer></footer>
+    <footer>
+      <a href="https://github.com/santhoshtr/recentcx">Source code</a>. &copy;
+      Santhosh Thottingal
+    </footer>
   </div>
 </template>
 
@@ -87,10 +89,17 @@ body {
   font-family: "Inter", sans-serif;
   font-weight: 400;
   color: #333333;
+  a {
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 main {
   padding: 1rem;
+  min-height: 85vh;
 }
 
 header {
@@ -104,6 +113,13 @@ header {
     border-bottom: 2px solid #d50000;
   }
 }
+
+footer {
+  padding: 1rem;
+  background: whitesmoke;
+  min-height: 10vh;
+}
+
 .title {
   text-decoration: none;
   color: #01579b;
