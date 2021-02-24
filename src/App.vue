@@ -30,13 +30,14 @@
 </template>
 
 <script>
-import User from "./components/User";
+import User from "./components/User.vue";
+
 export default {
   data: () => ({
     eventStreamSource: "https://stream.wikimedia.org/v2/stream/page-create",
     connected: false,
     eventSource: null,
-    messages: []
+    messages: [],
   }),
   components: { User },
   methods: {
@@ -50,7 +51,7 @@ export default {
       this.eventSource.onerror = () => {
         this.connected = false;
       };
-      this.eventSource.onmessage = event => {
+      this.eventSource.onmessage = (event) => {
         this.connected = true;
         const change = JSON.parse(event.data);
         if (change.parsedcomment && this.isTranslation(change)) {
@@ -62,21 +63,21 @@ export default {
       return change.parsedcomment.includes(
         "wikipedia.org/wiki/Special:Redirect/revision/"
       );
-    }
+    },
   },
   watch: {
-    connected: function() {
+    connected: function () {
       if (!this.connected) {
         this.eventSource.close();
         this.init();
         this.listen();
       }
-    }
+    },
   },
-  created: function() {
+  created: function () {
     this.init();
     this.listen();
-  }
+  },
 };
 </script>
 

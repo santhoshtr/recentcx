@@ -31,7 +31,7 @@ import Chart from "./Chart.vue";
 export default {
   name: "UserTranslation",
   props: {
-    user: String
+    user: String,
   },
   components: { Chart },
   data: () => ({
@@ -41,8 +41,8 @@ export default {
     chartOptions: { responsive: true, maintainAspectRatio: false },
     chartStyles: {
       position: "relative",
-      height: "300px"
-    }
+      height: "300px",
+    },
   }),
   computed: {
     publishTrend() {
@@ -65,11 +65,11 @@ export default {
             borderColor: "#40c4ff",
             borderWidth: 2,
             backgroundColor: "#b3e5fc",
-            data: this.months.map(month => this.publishTrend[month].delta)
-          }
-        ]
+            data: this.months.map((month) => this.publishTrend[month].delta),
+          },
+        ],
       };
-    }
+    },
   },
   async mounted() {
     if (this.loaded) return;
@@ -78,14 +78,14 @@ export default {
         `https://en.wikipedia.org/w/api.php?action=query&list=cxtranslatorstats&translator=${encodeURIComponent(
           this.user
         )}&origin=*&format=json`
-      ).then(response => response.json());
+      ).then((response) => response.json());
       this.cxtranslatorstats = cxtranslatorstats;
       this.loaded = true;
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
     }
-  }
+  },
 };
 </script>
 <style>

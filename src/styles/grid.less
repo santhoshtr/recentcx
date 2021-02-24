@@ -16,26 +16,34 @@
   md: ~"only screen and (min-width: 960px)"; // medium: large tablet to laptop
   lg: ~"only screen and (min-width: 1264px)"; // large: desktop
   xl: ~"only screen and (min-width: 1904px)"; // extra large: 4k and ultra-wides
-}
+};
 
 // Viewports
 @viewports: {
-  xs: ~"only screen and (max-width: 599px)";  // extra small: mobile and global
+  xs: ~"only screen and (max-width: 599px)"; // extra small: mobile and global
   sm: ~"only screen and (min-width: 600px) and (max-width: 959px)"; // small: small to medium tablet
   md: ~"only screen and (min-width: 960px) and (max-width: 1263px)"; // medium: large tablet to laptop
   lg: ~"only screen and (min-width: 1264px) and (max-width: 1903px)"; // large: desktop
   xl: ~"only screen and (min-width: 1904px)"; // extra large: 4k and ultra-wides
-}
+};
 
 // Generate LTR and RTL style for a given property and value. Replaces 'left' by 'right' and vice versa
 .bidi(@property, @value) {
   [dir="ltr"] & {
     @{property}: @value;
   }
-  @flipped-property-l2r: replace( @property, 'left', 'right');
-  @flipped-property: if( @flipped-property-l2r=@property, replace( @property, 'right', 'left'), @flipped-property-l2r );
-  @flipped-value-l2r: replace(@value, 'left', 'right');
-  @flipped-value: if( @flipped-value-l2r=@value,replace( @value, 'right', 'left'), @flipped-value-l2r );
+  @flipped-property-l2r: replace(@property, "left", "right");
+  @flipped-property: if(
+    @flipped-property-l2r= @property,
+    replace(@property, "right", "left"),
+    @flipped-property-l2r
+  );
+  @flipped-value-l2r: replace(@value, "left", "right");
+  @flipped-value: if(
+    @flipped-value-l2r= @value,
+    replace(@value, "right", "left"),
+    @flipped-value-l2r
+  );
 
   [dir="rtl"] & {
     @{flipped-property}: @flipped-value;
@@ -45,7 +53,7 @@
 // Generate style with responsive columns
 .generateResponsiveCols(@counter, @media) when (@counter > 0) {
   @width: (@counter / @cols) * 100;
-  @mediaKey: if(@media='', ~'', ~'@{media}-');
+  @mediaKey: if(@media= "", ~"", ~"@{media}-");
 
   .col-@{mediaKey}@{counter} {
     flex-basis: ~"@{width}%";
@@ -53,7 +61,7 @@
   }
 
   .col-offset-@{mediaKey}@{counter} {
-    .bidi(~' margin-left', ~"@{width}%");
+    .bidi(~" margin-left", ~"@{width}%");
   }
 
   .generateResponsiveCols((@counter - 1), @media);
@@ -62,16 +70,16 @@
 // Generate margin and padding style for different breakpoints.
 .generateSpacing(@counter, @media) when (@counter >= 0) {
   @width: @counter * 4;
-  @mediaKey: if(@media='', ~'', ~'@{media}-');
+  @mediaKey: if(@media= "", ~"", ~"@{media}-");
 
   .ps-@{mediaKey}@{counter} {
-    .bidi(~'padding-left', ~"@{width}px");
+    .bidi(~"padding-left", ~"@{width}px");
   }
   .ms-@{mediaKey}@{counter} {
     .bidi(~"margin-left", ~"@{width}px");
   }
   .pe-@{mediaKey}@{counter} {
-    .bidi(~'padding-right', ~"@{width}px");
+    .bidi(~"padding-right", ~"@{width}px");
   }
   .me-@{mediaKey}@{counter} {
     .bidi(~"margin-right", ~"@{width}px");
@@ -123,8 +131,8 @@
       padding-left: @gutter / 2;
     }
 
-    .generateResponsiveCols(@cols,'');
-    .generateSpacing(@cols, '');
+    .generateResponsiveCols(@cols,"");
+    .generateSpacing(@cols, "");
 
     each(@breakpoints, {
       .col-@{key}-hidden {
@@ -234,5 +242,4 @@
   .justify-between {
     justify-content: space-between;
   }
-
 }
