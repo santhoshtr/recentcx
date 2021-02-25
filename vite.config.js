@@ -1,11 +1,9 @@
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
+const vue2 = require("vite-plugin-vue2");
 
-// https://vitejs.dev/config/
-export default defineConfig({
+module.exports = {
   build: {
     // generate manifest.json in outDir
     manifest: true,
   },
-  plugins: [vue()],
-});
+  plugins: [vue2.createVuePlugin()],
+};
