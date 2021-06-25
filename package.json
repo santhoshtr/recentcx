@@ -12,6 +12,7 @@
 		"lint": "prettier --check --write src"
 	},
 	"dependencies": {
+		"chart.js": "^3.3.2",
 		"eventsource": "^1.1.0",
 		"vue": "^3.1.2",
 		"vue-chart-3": "0.1.7"
