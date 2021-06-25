@@ -8,16 +8,17 @@
           :key="message.meta.id"
           v-for="message in messages"
         >
-          <h2 class="title ma-0 col-12">
-            {{ message.page_title.replace(/_/g, " ") }}
+          <h2 class="title ma-0 pa-2 col-12">
+            <a :href="message.meta.uri" target="_blank">{{
+              message.page_title.replace(/_/g, " ")
+            }}</a>
           </h2>
-          <span class="domain col-12"
-            >{{ message.meta.domain }}
-            <a :href="message.meta.uri" target="_blank">View article</a></span
-          >
-          <span class="userstats col-12"
-            ><User :user="message.performer.user_text" />
-          </span>
+          <div class="col-12">
+            <User
+              :user="message.performer.user_text"
+              :domain="message.meta.domain"
+            />
+          </div>
         </li>
       </ul>
       <p v-else>Waiting for translations...</p>
@@ -31,59 +32,42 @@
 
 <script>
 import User from "./components/User.vue";
+import { ref } from "vue";
 
 export default {
-  data: () => ({
-    eventStreamSource: "https://stream.wikimedia.org/v2/stream/page-create",
-    connected: false,
-    eventSource: null,
-    messages: [],
-  }),
   components: { User },
-  methods: {
-    init() {
-      this.eventSource = new EventSource(this.eventStreamSource);
-    },
-    listen() {
-      this.eventSource.onopen = () => {
-        this.connected = true;
-      };
-      this.eventSource.onerror = () => {
-        this.connected = false;
-      };
-      this.eventSource.onmessage = (event) => {
-        this.connected = true;
-        const change = JSON.parse(event.data);
-        if (change.parsedcomment && this.isTranslation(change)) {
-          this.messages.unshift(change);
-        }
-      };
-    },
-    isTranslation(change) {
-      return change.parsedcomment.includes(
+  setup() {
+    const EventStreamSource =
+      "https://stream.wikimedia.org/v2/stream/page-create";
+    const connected = ref(false);
+    const eventSource = new EventSource(EventStreamSource);
+    const messages = ref([]);
+
+    const isTranslation = (change) =>
+      change.parsedcomment.includes(
         "wikipedia.org/wiki/Special:Redirect/revision/"
       );
-    },
-  },
-  watch: {
-    connected: function () {
-      if (!this.connected) {
-        this.eventSource.close();
-        this.init();
-        this.listen();
+
+    eventSource.onopen = () => (connected.value = true);
+    eventSource.onerror = () => (connected.value = false);
+    eventSource.onmessage = (event) => {
+      connected.value = true;
+      const change = JSON.parse(event.data);
+      if (change.parsedcomment && isTranslation(change)) {
+        messages.value.unshift(change);
       }
-    },
-  },
-  created: function () {
-    this.init();
-    this.listen();
+    };
+
+    return {
+      connected,
+      messages,
+    };
   },
 };
 </script>
 
 <style lang="less">
 @import "./styles/grid.less";
-@import url("https://rsms.me/inter/inter.css");
 
 body {
   margin: 0;
@@ -119,22 +103,20 @@ footer {
   padding: 1rem;
   background: whitesmoke;
   min-height: 10vh;
+  border-top: 1px solid #00bfa5;
 }
 
-.title {
+.title a {
   text-decoration: none;
   color: #01579b;
 }
 .date {
   padding: 4px;
 }
-.domain {
-  padding: 0 4px;
-  color: #999;
-}
+
 .title {
   padding: 4px;
-  transition: all 1s ease-in;
+  transition: all 0.3s ease-in;
 }
 
 ul li {

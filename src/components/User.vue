@@ -1,63 +1,71 @@
 <template>
   <section class="container">
     <div class="col-12">
+      <span class="domain pa-2">{{ domain }}</span>
+    </div>
+    <div class="col-12">
       <a
-        class="user"
+        class="user pa-2"
         :href="`https://en.wikipedia.org/wiki/User:${user}`"
         target="_blank"
         >User:{{ user }}</a
       >
       <a
-        class="total"
+        target="_blank"
+        class="contributions pa-2"
+        :href="`https://xtools.wmflabs.org/pages/${domain}/${user}`"
+        >Contributions</a
+      >
+      <span
+        class="total pa-2"
         v-if="total"
-        href="#"
         @click="detailsOpen = !detailsOpen"
         title="See contribution graph"
-        >{{ total }} translations</a
+        >{{ total }} translations</span
       >
     </div>
-    <chart
+    <Bar
+      class="pa-2"
       v-if="loaded && detailsOpen"
-      :chartdata="chartdata"
+      :data="chartdata"
       :options="chartOptions"
-      :styles="chartStyles"
+      :style="chartStyles"
     />
   </section>
 </template>
 
 <script>
-import Chart from "./Chart.vue";
-
+import { Bar } from "vue-chart-3";
+import { ref, computed, onMounted } from "@vue/runtime-core";
 export default {
   name: "UserTranslation",
   props: {
     user: String,
+    domain: String,
   },
-  components: { Chart },
-  data: () => ({
-    loaded: false,
-    detailsOpen: false,
-    cxtranslatorstats: {},
-    chartOptions: { responsive: true, maintainAspectRatio: false },
-    chartStyles: {
+  components: { Bar },
+  setup(props) {
+    const detailsOpen = ref(false);
+    const loaded = ref(false);
+    const chartOptions = { responsive: true, maintainAspectRatio: false };
+    const chartStyles = {
       position: "relative",
       height: "300px",
-    },
-  }),
-  computed: {
-    publishTrend() {
-      return this.cxtranslatorstats.publishTrend || {};
-    },
-    total() {
-      const lastMonth = this.publishTrend[this.months[this.months.length - 1]];
+    };
+
+    const publishTrend = ref({});
+    const months = computed(() => Object.keys(publishTrend.value));
+    const total = computed(() => {
+      const lastMonth =
+        publishTrend.value[months.value[months.value.length - 1]];
       return lastMonth && lastMonth.count;
-    },
-    months() {
-      return Object.keys(this.publishTrend) || [];
-    },
-    chartdata() {
+    });
+
+    const chartdata = computed(() => {
       return {
-        labels: this.months,
+        labels: months.value.map((month) =>
+          month.split("-").slice(0, 2).join("-")
+        ),
         responsive: true,
         datasets: [
           {
@@ -65,37 +73,56 @@ export default {
             borderColor: "#40c4ff",
             borderWidth: 2,
             backgroundColor: "#b3e5fc",
-            data: this.months.map((month) => this.publishTrend[month].delta),
+            data: months.value.map((month) => publishTrend.value[month].delta),
           },
         ],
       };
-    },
-  },
-  async mounted() {
-    if (this.loaded) return;
-    try {
-      const { cxtranslatorstats } = await fetch(
+    });
+
+    onMounted(() => {
+      if (loaded.value) return;
+
+      fetch(
         `https://en.wikipedia.org/w/api.php?action=query&list=cxtranslatorstats&translator=${encodeURIComponent(
-          this.user
+          props.user
         )}&origin=*&format=json`
-      ).then((response) => response.json());
-      this.cxtranslatorstats = cxtranslatorstats;
-      this.loaded = true;
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
-    }
+      )
+        .then((response) => response.json())
+        .then((response) => {
+          publishTrend.value = response.cxtranslatorstats.publishTrend;
+          loaded.value = true;
+        })
+        .catch((e) => {
+          // eslint-disable-next-line no-console
+          console.error(e);
+        });
+    });
+
+    return {
+      loaded,
+      total,
+      detailsOpen,
+      chartStyles,
+      chartOptions,
+      chartdata,
+    };
   },
 };
 </script>
-<style>
+<style lang="less">
 .total {
   color: #009688;
-  padding: 0 8px;
   cursor: pointer;
 }
 .user {
-  padding-right: 8px;
-  border-right: 1px solid #666;
+  color: #009688;
+  border-right: 1px solid #999;
+}
+.contributions {
+  color: #009688;
+  border-right: 1px solid #999;
+}
+.domain {
+  color: #999;
 }
 </style>

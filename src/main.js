@@ -1,7 +1,7 @@
-import Vue from "vue";
+import { createApp } from "vue";
 import App from "./App.vue";
 
-new Vue({
-  render: h => h(App),
-  el: "#app"
-});
+import { Chart, registerables } from "chart.js";
+Chart.register(...registerables);
+
+createApp(App).mount("#app");

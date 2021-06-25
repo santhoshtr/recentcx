@@ -1,9 +1,8 @@
-const vue2 = require("vite-plugin-vue2");
-
+import vue from "@vitejs/plugin-vue";
 module.exports = {
   build: {
     // generate manifest.json in outDir
     manifest: true,
   },
-  plugins: [vue2.createVuePlugin()],
+  plugins: [vue()],
 };
