@@ -40,24 +40,44 @@ export default {
     const EventStreamSource =
       "https://stream.wikimedia.org/v2/stream/page-create";
     const connected = ref(false);
-    const eventSource = new EventSource(EventStreamSource);
+    let eventSource = null;
+    let reconnectAttempts = 0;
     const messages = ref([]);
+
+    const onMessage = (change) => {
+      connected.value = true;
+      if (change.parsedcomment && isTranslation(change)) {
+        messages.value.unshift(change);
+      }
+    };
 
     const isTranslation = (change) =>
       change.parsedcomment.includes(
         "wikipedia.org/wiki/Special:Redirect/revision/"
       );
 
-    eventSource.onopen = () => (connected.value = true);
-    eventSource.onerror = () => (connected.value = false);
-    eventSource.onmessage = (event) => {
-      connected.value = true;
-      const change = JSON.parse(event.data);
-      if (change.parsedcomment && isTranslation(change)) {
-        messages.value.unshift(change);
-      }
+    const onOpen = () => (connected.value = true);
+
+    const onError = () => {
+      eventSource.close();
+      connected.value = false;
+      // Reconnect
+      initEventSource();
+      reconnectAttempts++;
     };
 
+    const initEventSource = () => {
+      if (reconnectAttempts > 16) {
+        location.reload();
+      }
+
+      eventSource = new EventSource(EventStreamSource);
+      eventSource.onopen = onOpen;
+      eventSource.onerror = onError;
+      eventSource.onmessage = (event) => onMessage(JSON.parse(event.data));
+    };
+
+    initEventSource();
     return {
       connected,
       messages,
